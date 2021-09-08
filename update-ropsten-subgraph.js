@@ -6,17 +6,12 @@ const fs = require('fs');
 const { readFileSync } = require("fs")
 const { resolve } = require("path")
 
-const contractOwnerProvider = new HDWalletProvider(
-  process.env.CONTRACT_OWNER_ETH_ACCOUNT_PRIVATE_KEY,
-  process.env.ETH_RPC_URL
-)
-
 const networkID = 3 // Ropsten
 const keepCorePackageName = "@keep-network/keep-core"
 const keepEcdsaPackageName = "@keep-network/keep-ecdsa"
 const keepTbtcPackageName = "@keep-network/tbtc"
 
-const web3 = new Web3(contractOwnerProvider)
+const web3 = new Web3(process.env.ETH_RPC_URL)
 
 let ropstenVars
 

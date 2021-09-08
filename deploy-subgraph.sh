@@ -25,7 +25,7 @@ fi
 
 printf "${LOG_START}Regenerating the subgraph...${LOG_END}"
 
-CONTRACT_OWNER_ETH_ACCOUNT_PRIVATE_KEY=${CONTRACT_OWNER_ETH_ACCOUNT_PRIVATE_KEY} ETH_RPC_URL=${ETH_RPC_URL} node ./update-ropsten-subgraph.js
+ETH_RPC_URL=${ETH_RPC_URL} node ./update-ropsten-subgraph.js
 
 printf "${LOG_START}Authenticating with thegraph.com...${LOG_END}"
 
