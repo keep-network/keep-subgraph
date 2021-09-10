@@ -18,31 +18,7 @@ let ropstenVars
 // This is for ropsten network only
 async function readDeployedArtifacts() {
 
-  const getDeploymentBlockNumber = async function (artifact, contractName) {
-    if (!artifact.networks[networkID].address) {
-      throw new Error(
-        `missing block number for network ${networkID} in ${contractName}`
-      )
-    }
-    const transaction = await web3.eth.getTransaction(artifact.networks[networkID].transactionHash)
-  
-    return transaction.blockNumber
-  }
-
-  const getDeploymentContractAddress = async function (artifact, contractName) {
-    if (!artifact.networks[networkID].address) {
-      throw new Error(
-        `missing address for network ${networkID} in ${contractName}`
-      )
-    }
-  
-    return artifact.networks[networkID].address
-  }
-
-  async function getExternalContractArtifact(
-    packageName,
-    contractName,
-  ) {
+  async function getContractData(packageName, contractName) {
     let artifactRaw
     try {
       artifactRaw = readFileSync(
@@ -51,7 +27,7 @@ async function readDeployedArtifacts() {
     } catch (err) {
       throw new Error(`failed to read artifact file: ${err.message}`)
     }
-  
+
     let artifact
     try {
       artifact = JSON.parse(artifactRaw)
@@ -64,89 +40,53 @@ async function readDeployedArtifacts() {
         `configuration for network ${networkID} not found in ${contractName}`
       )
     }
+
+    if (!artifact.networks[networkID].address) {
+      throw new Error(
+        `missing address for network ${networkID} in ${contractName}`
+      )
+    }
+
+    if (!artifact.networks[networkID].transactionHash) {
+      throw new Error(
+        `missing transactionHash for network ${networkID} in ${contractName}`
+      )
+    }
+
+    const deployTransaction = await web3.eth.getTransaction(
+      artifact.networks[networkID].transactionHash
+    )
+
+    return {
+      address: artifact.networks[networkID].address,
+      startBlock: deployTransaction.blockNumber,
+    }
+  }
   
-    return artifact
-  }
-
   // tbtc contracts
-  const TBTCDepositTokenContractName = "TBTCDepositToken"
-  const TBTCDepositTokenArtifact = await getExternalContractArtifact(keepTbtcPackageName, TBTCDepositTokenContractName)
-  const TBTCDepositToken = {
-    'address': await getDeploymentContractAddress(TBTCDepositTokenArtifact, TBTCDepositTokenContractName),
-    'startBlock': await getDeploymentBlockNumber(TBTCDepositTokenArtifact, TBTCDepositTokenContractName)
-  }
+  const TBTCDepositToken = await getContractData(keepTbtcPackageName, "TBTCDepositToken")
 
-  const TBTCTokenContractName = "TBTCToken"
-  const TBTCTokenArtifact = await getExternalContractArtifact(keepTbtcPackageName, TBTCTokenContractName)
-  const TBTCToken = {
-    'address': await getDeploymentContractAddress(TBTCTokenArtifact, TBTCTokenContractName),
-    'startBlock': await getDeploymentBlockNumber(TBTCTokenArtifact, TBTCTokenContractName)
-  }
+  const TBTCToken = await getContractData(keepTbtcPackageName, "TBTCToken")
 
-  const TBTCSystemContractName = "TBTCSystem"
-  const TBTCSystemArtifact = await getExternalContractArtifact(keepTbtcPackageName, TBTCSystemContractName)
-  const TBTCSystem = {
-    'address': await getDeploymentContractAddress(TBTCSystemArtifact, TBTCSystemContractName),
-    'startBlock': await getDeploymentBlockNumber(TBTCSystemArtifact, TBTCSystemContractName)
-  }
+  const TBTCSystem = await getContractData(keepTbtcPackageName, "TBTCSystem")
 
   // keep-ecdsa contracts
-  const KeepBondingContractName = "KeepBonding"
-  const KeepBondingArtifact = await getExternalContractArtifact(keepEcdsaPackageName, KeepBondingContractName)
-  const KeepBonding = {
-    'address': await getDeploymentContractAddress(KeepBondingArtifact, KeepBondingContractName),
-    'startBlock': await getDeploymentBlockNumber(KeepBondingArtifact, KeepBondingContractName)
-  }
+  const KeepBonding = await getContractData(keepEcdsaPackageName, "KeepBonding")
 
   // keep-core contracts
-  const KeepRandomBeaconOperatorContractName = "KeepRandomBeaconOperator"
-  const KeepRandomBeaconOperatorArtifact = await getExternalContractArtifact(keepCorePackageName, KeepRandomBeaconOperatorContractName)
-  const KeepRandomBeaconOperator = {
-    'address': await getDeploymentContractAddress(KeepRandomBeaconOperatorArtifact, KeepRandomBeaconOperatorContractName),
-    'startBlock': await getDeploymentBlockNumber(KeepRandomBeaconOperatorArtifact, KeepRandomBeaconOperatorContractName)
-  }
+  const KeepRandomBeaconOperator = await getContractData(keepCorePackageName, "KeepRandomBeaconOperator")
 
-  const KeepRandomBeaconServiceContractName = "KeepRandomBeaconService"
-  const KeepRandomBeaconServiceArtifact = await getExternalContractArtifact(keepCorePackageName, KeepRandomBeaconServiceContractName)
-  const KeepRandomBeaconService = {
-    'address': await getDeploymentContractAddress(KeepRandomBeaconServiceArtifact, KeepRandomBeaconServiceContractName),
-    'startBlock': await getDeploymentBlockNumber(KeepRandomBeaconServiceArtifact, KeepRandomBeaconServiceContractName)
-  }
+  const KeepRandomBeaconService = await getContractData(keepCorePackageName, "KeepRandomBeaconService")
 
-  const ManagedGrantFactoryContractName = "ManagedGrantFactory"
-  const ManagedGrantFactoryArtifact = await getExternalContractArtifact(keepCorePackageName, ManagedGrantFactoryContractName)
-  const ManagedGrantFactory = {
-    'address': await getDeploymentContractAddress(ManagedGrantFactoryArtifact, ManagedGrantFactoryContractName),
-    'startBlock': await getDeploymentBlockNumber(ManagedGrantFactoryArtifact, ManagedGrantFactoryContractName)
-  }
+  const ManagedGrantFactory = await getContractData(keepCorePackageName, "ManagedGrantFactory")
 
-  const StakingPortBackerContractName = "StakingPortBacker"
-  const StakingPortBackerArtifact = await getExternalContractArtifact(keepCorePackageName, StakingPortBackerContractName)
-  const StakingPortBacker = {
-    'address': await getDeploymentContractAddress(StakingPortBackerArtifact, StakingPortBackerContractName),
-    'startBlock': await getDeploymentBlockNumber(StakingPortBackerArtifact, StakingPortBackerContractName)
-  }
+  const StakingPortBacker = await getContractData(keepCorePackageName, "StakingPortBacker")
 
-  const TokenStakingContractName = "TokenStaking"
-  const TokenStakingArtifact = await getExternalContractArtifact(keepCorePackageName, TokenStakingContractName)
-  const TokenStaking = {
-    'address': await getDeploymentContractAddress(TokenStakingArtifact, TokenStakingContractName),
-    'startBlock': await getDeploymentBlockNumber(TokenStakingArtifact, TokenStakingContractName)
-  }
+  const TokenStaking = await getContractData(keepCorePackageName, "TokenStaking")
 
-  const TokenGrantContractName = "TokenGrant"
-  const TokenGrantArtifact = await getExternalContractArtifact(keepCorePackageName, TokenGrantContractName)
-  const TokenGrant = {
-    'address': await getDeploymentContractAddress(TokenGrantArtifact, TokenGrantContractName),
-    'startBlock': await getDeploymentBlockNumber(TokenGrantArtifact, TokenGrantContractName)
-  }
+  const TokenGrant = await getContractData(keepCorePackageName, "TokenGrant")
 
-  const TokenStakingEscrowContractName = "TokenStakingEscrow"
-  const TokenStakingEscrowArtifact = await getExternalContractArtifact(keepCorePackageName, TokenStakingEscrowContractName)
-  const TokenStakingEscrow = {
-    'address': await getDeploymentContractAddress(TokenStakingEscrowArtifact, TokenStakingEscrowContractName),
-    'startBlock': await getDeploymentBlockNumber(TokenStakingEscrowArtifact, TokenStakingEscrowContractName)
-  }
+  const TokenStakingEscrow = await getContractData(keepCorePackageName, "TokenStakingEscrow")
 
 
   ropstenVars = {
@@ -163,7 +103,6 @@ async function readDeployedArtifacts() {
     ManagedGrantFactory,
     StakingPortBacker,
   }
-
 }
 
 readDeployedArtifacts()
