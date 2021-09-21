@@ -12,7 +12,7 @@ printf "${LOG_START}Fetching 'deploy-subgraph' npm packages...${LOG_END}"
 yarn
 
 printf "${LOG_START}Installing Graph CLI...${LOG_END}"
-yarn global add @graphprotocol/graph-cli@0.19.0
+yarn global add @graphprotocol/graph-cli@0.21.1
 
 # for CI purposes, it will get the latest deployed npm packages for the current CI jobs
 if [[ $KEEP_CORE_VERSION != "" ]] && [[ $KEEP_ECDSA_VERSION != "" ]] && [[ $KEEP_TBTC_VERSION != "" ]]
