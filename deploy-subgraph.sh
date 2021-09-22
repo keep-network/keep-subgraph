@@ -52,4 +52,6 @@ filter_non_printable=$(tr -dc '[[:print:]]' <<< ${filter_url})
 # remove everything after the url split by '['
 echo ${filter_non_printable} | cut -f1 -d"[" >> subgraph_api
 
+echo $(head -n 1 subgraph_api)
+
 printf "${DONE_START}Subgraph deployed successfully!${DONE_END}"
