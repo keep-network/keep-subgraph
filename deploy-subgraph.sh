@@ -17,10 +17,10 @@ yarn global add @graphprotocol/graph-cli@0.21.1
 # for CI purposes, it will get the latest deployed npm packages for the current CI jobs
 if [[ $KEEP_CORE_VERSION != "" ]] && [[ $KEEP_ECDSA_VERSION != "" ]] && [[ $KEEP_TBTC_VERSION != "" ]]
 then
-    yarn upgrade \
-      @keep-network/keep-core@$KEEP_CORE_VERSION  \
+    yarn upgrade --exact \
+      @keep-network/keep-core@$KEEP_CORE_VERSION \
       @keep-network/keep-ecdsa@$KEEP_ECDSA_VERSION \
-      @keep-network/tbtc@$KEEP_TBTC_VERSION  --exact
+      @keep-network/tbtc@$KEEP_TBTC_VERSION
 fi
 
 printf "${LOG_START}Regenerating the subgraph...${LOG_END}"

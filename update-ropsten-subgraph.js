@@ -1,5 +1,4 @@
 const Web3 = require("web3")
-const HDWalletProvider = require("@truffle/hdwallet-provider")
 const nunjucks = require('nunjucks');
 const fs = require('fs');
 
@@ -53,9 +52,20 @@ async function readDeployedArtifacts() {
       )
     }
 
-    const deployTransaction = await web3.eth.getTransaction(
-      artifact.networks[networkID].transactionHash
-    )
+    let deployTransaction
+    try {
+      deployTransaction = await web3.eth.getTransaction(
+        artifact.networks[networkID].transactionHash
+      )
+    } catch (err) {
+      throw new Error(`failed to get deployment transaction: ${err.message}`)
+    }
+
+    if (!deployTransaction.blockNumber) {
+      throw new Error(
+        `missing deployTransaction blockNumber for network ${networkID} in ${contractName}`
+      )
+    }
 
     return {
       address: artifact.networks[networkID].address,
